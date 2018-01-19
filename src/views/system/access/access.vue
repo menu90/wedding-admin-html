@@ -1,6 +1,6 @@
 <style lang="less">
-    @import '../../../styles/common.less';
-    @import '../../../styles/table.less';
+    @import '../../../styles/css/common.less';
+    @import '../../../styles/css/table.less';
 </style>
 
 <template>
@@ -22,11 +22,11 @@
                         </Select>
                     </FormItem>
                     <FormItem>
-                        <span @click="handleSearch('rolesSelectFrom')" style="margin: 0 10px;"><Button type="primary" icon="search">查询</Button></span>
-                        <Button @click="handleCancel('rolesSelectFrom')" type="ghost" >取消</Button>
+                        <span @click="handleSearch('rolesSelectFrom')" style="margin: 0 10px;"><Button type="primary" icon="search" :disabled="lookMenuList.queryRoles">查询</Button></span>
+                        <Button @click="handleCancel('rolesSelectFrom')" type="ghost" :disabled="lookMenuList.cancelRoles">取消</Button>
                     </FormItem>
                 </Form>
-                <Button type="primary" @click="addRoles = true">添加</Button>
+                <Button type="primary" @click="addRoles = true" :disabled="lookMenuList.addRoles">添加</Button>
             </Row>
             <Row>
                 <div class="edittable-table-height-con">
@@ -66,8 +66,9 @@
 </template>
 
 <script>
-import canEditTable from './canEditTable.vue';
+import canEditTable from './update.vue';
 import tableData from './table_data.js';
+import {addRoles,lookMenu} from '../../../api/api.js';
 export default {
     name: 'editable-table',
     components: {
@@ -78,6 +79,13 @@ export default {
             rolesSelectFrom: {
                 names: '',
                 status: '0'
+            },
+            lookMenuList:{
+                addRoles:true,
+                queryRoles:true,
+                editRoles:true,
+                deleteRoles:true,
+                cancelRoles:true
             },
             addRolesFormValidate: {
                 names: '',
@@ -93,15 +101,32 @@ export default {
             selectNames: '',
             roleStateList: [{value: '0',name: '有效'}, {value: '1', name: '无效'}],
             showCurrentTableData: false,
-            addRoles: false,
+            addRoles: false
         };
     },
     methods: {
         init(){
             this.selectRole = this.initRole = table.selectNames;
         },
-        getData () {
+        getHeader(lookMenuList){
+            let handelTitle = [];
+            if(!handelTitle.editRoles){
+                handelTitle.push('edit');
+            }
+            if(!handelTitle.deleteRoles){
+                handelTitle.push('delete');
+            }
+            handelTitle.push('choose');
+            let header = {
+                title: '操作',
+                align: 'center',
+                key: 'handle',
+                handle: handelTitle
+            }
             this.rolesList = tableData.rolesList;
+            this.rolesList.push(header);
+        },
+        getData () {
             this.rolesListData = tableData.rolesListData;
         },
         handleNetConnect (state) {
@@ -129,6 +154,29 @@ export default {
         handleCancel (name) {
             this.$refs[name].resetFields();
         },
+        lookBtn(){
+            this.logining = true; 
+            var params = {
+                name : 'access'
+            };
+            lookMenu(params).then(data => {
+                this.logining = false;
+                let { msg, code, lookMenu } = data.data;
+                let lookList = {};
+                lookMenu.forEach(function(item){
+                    let name = item.name;
+                    if(item.access == 1){
+                        lookList[name] = false;
+                    }else{
+                        lookList[name] = true;
+                    }
+                });
+                this.lookMenuList = lookList;
+                this.getHeader(this.lookMenuList);
+                this.getData();
+            });
+            
+        },
         search (data, argumentObj) {
             let res = data;
             let dataClone = data;
@@ -142,21 +190,29 @@ export default {
             }
             return res;
         },
-        handleSubmit (name) {
-            this.$refs[name].validate((valid) => {
+        handleSubmit (formName) {
+            this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    this.$Message.success('Success!');
+                    this.logining = true; 
+                    var params = {
+                        names : this.$refs[formName].model.names,
+                        status : this.$refs[formName].model.status
+                    };
+                    addRoles(params).then(data => {
+                        this.logining = false;
+                        let { msg, code, user } = data;
+                    });
                 } else {
-                    this.$Message.error('Fail!');
+                    this.$Message.error('参数填写错误!');
                 }
             })
         },
-        handleReset (name) {
-            this.$refs[name].resetFields();
+        handleReset (formName) {
+            this.$refs[formName].resetFields();
         }
     },
     created () {
-        this.getData();
+        this.lookBtn();
     }
 };
 </script>

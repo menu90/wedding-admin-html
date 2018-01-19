@@ -1,5 +1,5 @@
 <style lang="less">
-    @import './login.less';
+    @import '../styles/css/login.less';
 </style>
 
 <template>
@@ -35,10 +35,12 @@
             </Card>
         </div>
     </div>
+    
 </template>
 
 <script>
 import Cookies from 'js-cookie';
+import {login} from '../api/api.js';
 export default {
     data () {
         return {
@@ -60,16 +62,23 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    Cookies.set('user', this.form.userName);
-                    Cookies.set('password', this.form.password);
-                    this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                    if (this.form.userName === 'iview_admin') {
-                        Cookies.set('access', 0);
-                    } else {
-                        Cookies.set('access', 1);
-                    }
-                    this.$router.push({
-                        name: 'home_index'
+                    this.logining = true;
+                    var params = {
+                        'user':this.form.userName
+                    };
+                    login(params).then(data => {
+                        this.logining = false;
+                        let { code, message,  name} = data.data;
+                        if(code === 1){
+                            Cookies.set('userName', name);
+                            Cookies.set('access', 1);//权限
+                            Cookies.set('password', "123456");
+                            this.$router.push({
+                                name: 'home_index'
+                            });
+                        }else{
+                            alert(message);
+                        }
                     });
                 }
             });

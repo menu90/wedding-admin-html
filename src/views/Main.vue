@@ -1,5 +1,5 @@
 <style lang="less">
-    @import "./main.less";
+    @import "../styles/css/main.less";
 </style>
 <template>
     <div class="main" :class="{'main-hide-text': shrink}">
@@ -12,8 +12,8 @@
                 :open-names="openedSubmenuArr"
                 :menu-list="menuList">
                 <div slot="top" class="logo-con">
-                    <img v-show="!shrink"  src="../images/logo.jpg" key="max-logo" />
-                    <img v-show="shrink" src="../images/logo-min.jpg" key="min-logo" />
+                    <img v-show="!shrink"  src="../styles/images/logo.jpg" key="max-logo" />
+                    <img v-show="shrink" src="../styles/images/logo-min.jpg" key="min-logo" />
                 </div>
             </shrinkable-menu>
         </div>
@@ -66,13 +66,13 @@
     </div>
 </template>
 <script>
-    import shrinkableMenu from './main-components/shrinkable-menu/shrinkable-menu.vue';
-    import tagsPageOpened from './main-components/tags-page-opened.vue';
-    import breadcrumbNav from './main-components/breadcrumb-nav.vue';
-    import fullScreen from './main-components/fullscreen.vue';
-    import lockScreen from './main-components/lockscreen/lockscreen.vue';
-    import messageTip from './main-components/message-tip.vue';
-    import themeSwitch from './main-components/theme-switch/theme-switch.vue';
+    import shrinkableMenu from './menu/index.vue';
+    import tagsPageOpened from './main/tags.vue';
+    import breadcrumbNav from './main/navs.vue';
+    import fullScreen from './main/fullscreen.vue';
+    import lockScreen from './main/lockscreen/lockscreen.vue';
+    import messageTip from './main/message-tip.vue';
+    import themeSwitch from './main/theme-switch/theme-switch.vue';
     import Cookies from 'js-cookie';
     import util from '@/libs/util.js';
     
@@ -165,11 +165,7 @@
                 // console.log(val)
             },
             beforePush (name) {
-                // if (name === 'accesstest_index') {
-                //     return false;
-                // } else {
-                //     return true;
-                // }
+                
                 return true;
             },
             fullscreenChange (isFullScreen) {

@@ -19,17 +19,6 @@ export const rolesList = [
         key: 'status',
         editable: true,
         editRender:1
-        /*render: (h, params) => {
-            const row = params.row;
-            const color = row.status === '0' ? 'blue' : 'red';
-            const text = row.status === '0' ? '有效' : '无效';
-            return h('Tag', {
-                props: {
-                    type: 'dot',
-                    color: color
-                }
-            }, text);
-        }*/
     },
     {
        
@@ -42,14 +31,6 @@ export const rolesList = [
         title: '创建时间',
         align: 'center',
         key: 'createtime'
-    },
-    {
-         
-        title: '操作',
-        align: 'center',
-        width: 190,
-        key: 'handle',
-        handle: ['edit', 'delete']
     }
 ];
 

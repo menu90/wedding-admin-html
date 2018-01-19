@@ -1,17 +1,20 @@
+// The Vue build version to load with the `import` command
+// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
-import iView from 'iview';
+import App from './App';
 import {router} from './router/index';
 import {appRouter} from './router/router';
-import store from './store';
-import App from './app.vue';
-import '@/locale';
-import 'iview/dist/styles/iview.css';
+import iView from 'iview';
+import 'iview/dist/styles/iview.css';    // 使用 CSS
 import VueI18n from 'vue-i18n';
-import { VirtualScroller } from 'vue-virtual-scroller';
+import store from './store';
 
-Vue.use(VueI18n);
 Vue.use(iView);
-Vue.component('virtual-scroller', VirtualScroller);
+Vue.use(VueI18n);
+
+Vue.config.productionTip = false;
+
+/* eslint-disable no-new */
 
 new Vue({
     el: '#app',

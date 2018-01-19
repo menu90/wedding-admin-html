@@ -1,6 +1,7 @@
 import {otherRouter, appRouter} from '@/router/router';
 import Util from '@/libs/util';
 import Cookies from 'js-cookie';
+import {accessMenu} from '../../api/api.js';
 import Vue from 'vue';
 
 const app = {
@@ -38,50 +39,28 @@ const app = {
             state.tagsList.push(...list);
         },
         updateMenulist (state) {
-            let accessCode = parseInt(Cookies.get('access'));
-            let menuList = [];
-            appRouter.forEach((item, index) => {
-                if (item.access !== undefined) {
-                    if (Util.showThisRoute(item.access, accessCode)) {
-                        if (item.children.length === 1) {
-                            menuList.push(item);
-                        } else {
-                            let len = menuList.push(item);
-                            let childrenArr = [];
-                            childrenArr = item.children.filter(child => {
-                                if (child.access !== undefined) {
-                                    if (child.access === accessCode) {
-                                        return child;
-                                    }
-                                } else {
-                                    return child;
+           let accessCode = parseInt(Cookies.get('access'));
+            var params ={};
+            accessMenu(params).then(data => {
+                let menuList = [];
+                let { code, message,  accessMenuList} = data.data;
+                accessMenuList.forEach(function(item){
+                    let subMenuList = [];
+                    if(item.access == 1){
+                        if(item.children.length > 0){
+                            item.children.forEach(function(it){
+                                if(it.access == 1){
+                                    subMenuList.push(it);
                                 }
                             });
-                            menuList[len - 1].children = childrenArr;
                         }
                     }
-                } else {
-                    if (item.children.length === 1) {
-                        menuList.push(item);
-                    } else {
-                        let len = menuList.push(item);
-                        let childrenArr = [];
-                        childrenArr = item.children.filter(child => {
-                            if (child.access !== undefined) {
-                                if (Util.showThisRoute(child.access, accessCode)) {
-                                    return child;
-                                }
-                            } else {
-                                return child;
-                            }
-                        });
-                        let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
-                        handledItem.children = childrenArr;
-                        menuList.splice(len - 1, 1, handledItem);
-                    }
-                }
+                    item.children = subMenuList;
+                    menuList.push(item);
+                });
+                state.menuList = menuList;
+                
             });
-            state.menuList = menuList;
         },
         changeMenuTheme (state, theme) {
             state.menuTheme = theme;
